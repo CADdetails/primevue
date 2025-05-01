@@ -142,9 +142,8 @@
                                             :aria-disabled="isOptionDisabled(option)"
                                             :aria-setsize="ariaSetSize"
                                             :aria-posinset="getAriaPosInset(getOptionIndex(i, getItemOptions))"
-                                            @mousedown="onOptionSelect($event, option)"
+                                            @click="onOptionSelect($event, option)"
                                             @mousemove="onOptionMouseMove($event, getOptionIndex(i, getItemOptions))"
-                                            @click.stop
                                             :data-p-selected="!checkmark && isSelected(option)"
                                             :data-p-focused="focusedOptionIndex === getOptionIndex(i, getItemOptions)"
                                             :data-p-disabled="isOptionDisabled(option)"
@@ -797,7 +796,7 @@ export default {
                         focus(this.$refs.focusInput);
                     };
 
-                    label.addEventListener('click', this.labelClickListener);
+                    label.addEventListener('mousedown', this.labelClickListener);
                 }
             }
         },
@@ -806,7 +805,7 @@ export default {
                 const label = document.querySelector(`label[for="${this.labelId}"]`);
 
                 if (label && isVisible(label)) {
-                    label.removeEventListener('click', this.labelClickListener);
+                    label.removeEventListener('mousedown', this.labelClickListener);
                 }
             }
         },

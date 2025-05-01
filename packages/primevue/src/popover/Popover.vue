@@ -4,7 +4,7 @@
             <div v-if="visible" :ref="containerRef" v-focustrap role="dialog" :aria-modal="visible" @click="onOverlayClick" :class="cx('root')" v-bind="ptmi('root')">
                 <slot v-if="$slots.container" name="container" :closeCallback="hide" :keydownCallback="(event) => onButtonKeydown(event)"></slot>
                 <template v-else>
-                    <div :class="cx('content')" @click="onContentClick" @mousedown="onContentClick" @keydown="onContentKeydown" v-bind="ptm('content')">
+                    <div :class="cx('content')" @click.capture="onContentClick" @mousedown.capture="onContentClick" @keydown="onContentKeydown" v-bind="ptm('content')">
                         <slot></slot>
                     </div>
                 </template>
@@ -118,7 +118,7 @@ export default {
             }
 
             this.overlayEventListener = (e) => {
-                if (this.container.contains(e.target)) {
+                if (this.container.contains(e.target) || e.target.closest('.p-popover') === this.container) {
                     this.selfClick = true;
                 }
             };
@@ -146,8 +146,7 @@ export default {
             }
         },
         alignOverlay() {
-            absolutePosition(this.container, this.target, false);
-
+            absolutePosition(this.container, this.target);
             const containerOffset = getOffset(this.container);
             const targetOffset = getOffset(this.target);
             let arrowLeft = 0;
@@ -208,10 +207,11 @@ export default {
         bindOutsideClickListener() {
             if (!this.outsideClickListener && isClient()) {
                 this.outsideClickListener = (event) => {
+                    if (event.composedPath().includes(this.container)) this.selfClick = true;
+
                     if (this.visible && !this.selfClick && !this.isTargetClicked(event)) {
                         this.visible = false;
                     }
-
                     this.selfClick = false;
                 };
 
@@ -220,7 +220,7 @@ export default {
         },
         unbindOutsideClickListener() {
             if (this.outsideClickListener) {
-                document.removeEventListener('clmousedownick', this.outsideClickListener);
+                document.removeEventListener('mousedown', this.outsideClickListener);
                 this.outsideClickListener = null;
                 this.selfClick = false;
             }

@@ -1404,11 +1404,14 @@ export default {
             if (this.documentColumnResizeListener) {
                 document.removeEventListener('document', this.documentColumnResizeListener);
                 this.documentColumnResizeListener = null;
+
+                document.removeEventListener('mousemove', this.documentColumnResizeListener);
             }
 
             if (this.documentColumnResizeEndListener) {
                 document.removeEventListener('document', this.documentColumnResizeEndListener);
                 this.documentColumnResizeEndListener = null;
+                document.removeEventListener('mouseup', this.documentColumnResizeEndListener);
             }
         },
         onColumnHeaderMouseDown(e) {
