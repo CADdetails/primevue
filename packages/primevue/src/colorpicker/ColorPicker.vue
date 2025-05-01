@@ -460,6 +460,7 @@ export default {
             this.hueDragging = true;
             this.pickHue(event);
             !this.isUnstyled && addClass(this.$el, 'p-colorpicker-dragging');
+            event.preventDefault();
         },
         isInputClicked(event) {
             return this.$refs.input && this.$refs.input.isSameNode(event.target);
@@ -480,12 +481,12 @@ export default {
                     }
                 };
 
-                document.addEventListener('click', this.outsideClickListener, true);
+                document.addEventListener('mousedown', this.outsideClickListener, true);
             }
         },
         unbindOutsideClickListener() {
             if (this.outsideClickListener) {
-                document.removeEventListener('click', this.outsideClickListener, true);
+                document.removeEventListener('mousedown', this.outsideClickListener, true);
                 this.outsideClickListener = null;
             }
         },
