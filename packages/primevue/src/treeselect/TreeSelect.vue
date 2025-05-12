@@ -345,6 +345,9 @@ export default {
             addStyle(el, { position: 'absolute', top: '0' });
             this.alignOverlay();
             this.focus();
+
+            // Issue: #7508
+            this.$attrSelector && el.setAttribute(this.$attrSelector, '');
         },
         onOverlayAfterEnter() {
             this.bindOutsideClickListener();
@@ -388,12 +391,12 @@ export default {
                     this.selfClick = false;
                 };
 
-                document.addEventListener('mousedown', this.outsideClickListener, true);
+                document.addEventListener('click', this.outsideClickListener, true);
             }
         },
         unbindOutsideClickListener() {
             if (this.outsideClickListener) {
-                document.removeEventListener('mousedown', this.outsideClickListener, true);
+                document.removeEventListener('click', this.outsideClickListener, true);
                 this.outsideClickListener = null;
             }
         },

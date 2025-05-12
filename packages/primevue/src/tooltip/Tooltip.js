@@ -87,6 +87,7 @@ const Tooltip = BaseTooltip.extend('tooltip', {
     unmounted(el, options) {
         let target = this.getTarget(el);
 
+        this.hide(el, 0);
         this.remove(target);
         this.unbindEvents(target, options);
 
@@ -143,6 +144,10 @@ const Tooltip = BaseTooltip.extend('tooltip', {
 
             el.removeEventListener('keydown', el.$_ptooltipKeydownEvent);
             window.removeEventListener('resize', el.$_pWindowResizeEvent);
+
+            if (el.$_ptooltipId) {
+                this.remove(el);
+            }
         },
         bindScrollListener(el) {
             if (!el.$_ptooltipScrollHandler) {
@@ -439,11 +444,12 @@ const Tooltip = BaseTooltip.extend('tooltip', {
             let elementWidth = getOuterWidth(el);
             let { width: viewportWidth } = getViewport();
             let hostOffset = this.getHostOffset(el);
-            let left = hostOffset.left + (getOuterWidth(el) - getOuterWidth(tooltipElement)) / 2;
+            let left = hostOffset.left + (elementWidth - tooltipWidth) / 2;
             let top = hostOffset.top - getOuterHeight(tooltipElement);
 
-            if (hostOffset.left + tooltipWidth > viewportWidth) {
-                // accounting for a scrollbar being present, getViewport() width includes scrollbars
+            if (left < 0) {
+                left = 0;
+            } else if (left + tooltipWidth > viewportWidth) {
                 left = Math.floor(hostOffset.left + elementWidth - tooltipWidth);
             }
 
@@ -467,11 +473,12 @@ const Tooltip = BaseTooltip.extend('tooltip', {
             let { width: viewportWidth } = getViewport();
             let hostOffset = this.getHostOffset(el);
 
-            let left = hostOffset.left + (getOuterWidth(el) - getOuterWidth(tooltipElement)) / 2;
+            let left = hostOffset.left + (elementWidth - tooltipWidth) / 2;
             let top = hostOffset.top + getOuterHeight(el);
 
-            if (hostOffset.left + tooltipWidth > viewportWidth) {
-                // accounting for a scrollbar being present, getViewport() width includes scrollbars
+            if (left < 0) {
+                left = 0;
+            } else if (left + tooltipWidth > viewportWidth) {
                 left = Math.floor(hostOffset.left + elementWidth - tooltipWidth);
             }
 

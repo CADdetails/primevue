@@ -34,6 +34,7 @@
             :data-p-has-dropdown="showIcon && iconDisplay === 'button' && !inline"
             :data-p-has-e-icon="showIcon && iconDisplay === 'input' && !inline"
             :pt="ptm('pcInputText')"
+            :formControl="{ novalidate: true }"
         />
         <slot v-if="showIcon && iconDisplay === 'button' && !inline" name="dropdownbutton" :toggleCallback="onButtonClick">
             <button
@@ -909,6 +910,9 @@ export default {
                 ZIndex.set('overlay', el, this.baseZIndex || this.$primevue.config.zIndex.overlay);
             }
 
+            // Issue: #7508
+            this.$attrSelector && el.setAttribute(this.$attrSelector, '');
+
             this.alignOverlay();
             this.$emit('show');
         },
@@ -1489,7 +1493,7 @@ export default {
             event.preventDefault();
         },
         onClearButtonClick(event) {
-            this.updateModel(null);
+            this.updateModel(this.$formDefaultValue || null);
             this.overlayVisible = false;
             this.$emit('clear-click', event);
             event.preventDefault();

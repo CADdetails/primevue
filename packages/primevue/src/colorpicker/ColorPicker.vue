@@ -362,6 +362,9 @@ export default {
                 ZIndex.set('overlay', el, this.baseZIndex, this.$primevue.config.zIndex.overlay);
             }
 
+            // Issue: #7508
+            this.$attrSelector && el.setAttribute(this.$attrSelector, '');
+
             this.$emit('show');
         },
         onOverlayLeave() {
@@ -481,12 +484,12 @@ export default {
                     }
                 };
 
-                document.addEventListener('mousedown', this.outsideClickListener, true);
+                document.addEventListener('click', this.outsideClickListener, true);
             }
         },
         unbindOutsideClickListener() {
             if (this.outsideClickListener) {
-                document.removeEventListener('mousedown', this.outsideClickListener, true);
+                document.removeEventListener('click', this.outsideClickListener, true);
                 this.outsideClickListener = null;
             }
         },

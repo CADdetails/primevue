@@ -740,6 +740,9 @@ export default {
 
             this.autoFilterFocus && focus(this.$refs.filterInput.$el);
             this.autoUpdateModel();
+
+            // Issue: #7508
+            this.$attrSelector && el.setAttribute(this.$attrSelector, '');
         },
         onOverlayAfterEnter() {
             this.bindOutsideClickListener();
@@ -775,12 +778,12 @@ export default {
                     }
                 };
 
-                document.addEventListener('mousedown', this.outsideClickListener, true);
+                document.addEventListener('click', this.outsideClickListener, true);
             }
         },
         unbindOutsideClickListener() {
             if (this.outsideClickListener) {
-                document.removeEventListener('mousedown', this.outsideClickListener, true);
+                document.removeEventListener('click', this.outsideClickListener, true);
                 this.outsideClickListener = null;
             }
         },
@@ -934,7 +937,7 @@ export default {
             return matchedOptionIndex > -1 ? matchedOptionIndex : index;
         },
         findFirstFocusedOptionIndex() {
-            const selectedIndex = this.findSelectedOptionIndex();
+            const selectedIndex = this.findFirstSelectedOptionIndex();
 
             return selectedIndex < 0 ? this.findFirstOptionIndex() : selectedIndex;
         },

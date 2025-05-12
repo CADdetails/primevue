@@ -474,13 +474,8 @@ export default {
         onMenuMatchModeChange(value, index) {
             let _filters = { ...this.filters };
 
-            if (_filters[this.field].operator && _filters[this.field].constraints) {
-                _filters[this.field].constraints[index].matchMode = value;
-                this.$emit('matchmode-change', { field: this.field, matchMode: value, index: index });
-            } else {
-                _filters[this.field].matchMode = matchMode;
-                this.$emit('matchmode-change', { field: this.field, matchMode: value });
-            }
+            _filters[this.field].constraints[index].matchMode = value;
+            this.$emit('matchmode-change', { field: this.field, matchMode: value, index: index });
 
             if (!this.showApplyButton) {
                 this.$emit('filter-apply');
@@ -491,7 +486,7 @@ export default {
             let newConstraint = { value: null, matchMode: this.defaultMatchMode };
 
             _filters[this.field].constraints.push(newConstraint);
-            this.$emit('constraint-add', { field: this.field, constraing: newConstraint });
+            this.$emit('constraint-add', { field: this.field, constraint: newConstraint });
             this.$emit('filter-change', _filters);
 
             if (!this.showApplyButton) {
@@ -502,7 +497,7 @@ export default {
             let _filters = { ...this.filters };
             let removedConstraint = _filters[this.field].constraints.splice(index, 1);
 
-            this.$emit('constraint-remove', { field: this.field, constraing: removedConstraint });
+            this.$emit('constraint-remove', { field: this.field, constraint: removedConstraint });
             this.$emit('filter-change', _filters);
 
             if (!this.showApplyButton) {
@@ -596,12 +591,12 @@ export default {
                     this.selfClick = false;
                 };
 
-                document.addEventListener('mousedown', this.outsideClickListener, true);
+                document.addEventListener('click', this.outsideClickListener, true);
             }
         },
         unbindOutsideClickListener() {
             if (this.outsideClickListener) {
-                document.removeEventListener('mousedown', this.outsideClickListener, true);
+                document.removeEventListener('click', this.outsideClickListener, true);
                 this.outsideClickListener = null;
                 this.selfClick = false;
             }
