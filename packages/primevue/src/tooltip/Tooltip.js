@@ -95,6 +95,15 @@ const Tooltip = BaseTooltip.extend('tooltip', {
             target.$_ptooltipScrollHandler.destroy();
             target.$_ptooltipScrollHandler = null;
         }
+        if (el.$_pWindowResizeEvent) {
+            window.removeEventListener('resize', el.$_pWindowResizeEvent);
+            el.$_pWindowResizeEvent = null;
+        }
+
+        if (el.$_ptooltipMouseLeaveEvent) {
+            el.removeEventListener('mouseleave', el.$_ptooltipMouseLeaveEvent);
+            el.$_ptooltipMouseLeaveEvent = null;
+        }
     },
     timer: undefined,
     methods: {

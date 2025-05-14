@@ -308,25 +308,18 @@ export default {
         bindDocumentEditListener() {
             if (!this.documentEditListener) {
                 this.documentEditListener = (event) => {
-                    this.selfClick = this.$el && this.$el.contains(event.target);
-
-                    if (this.editCompleteTimeout) {
-                        clearTimeout(this.editCompleteTimeout);
-                    }
-
                     if (!this.selfClick) {
-                        this.editCompleteTimeout = setTimeout(() => {
-                            this.completeEdit(event, 'outside');
-                        }, 1);
+                        this.completeEdit(event, 'outside');
                     }
+                    this.selfClick = false;
                 };
-
-                document.addEventListener('mousedown', this.documentEditListener);
+                //
+                document.addEventListener('click', this.documentEditListener);
             }
         },
         unbindDocumentEditListener() {
             if (this.documentEditListener) {
-                document.removeEventListener('mousedown', this.documentEditListener);
+                document.removeEventListener('click', this.documentEditListener);
                 this.documentEditListener = null;
                 this.selfClick = false;
 
@@ -344,6 +337,7 @@ export default {
         },
         onClick(event) {
             if (this.editMode === 'cell' && this.isEditable()) {
+                this.selfClick = true;
                 if (!this.d_editing) {
                     this.d_editing = true;
                     this.bindDocumentEditListener();
