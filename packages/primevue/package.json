@@ -337,7 +337,7 @@
         "access": "public"
     },
     "scripts": {
-        "build": "NODE_ENV=production INPUT_DIR=src/ OUTPUT_DIR=dist/ pnpm run build:package",
+        "build": "cross-env NODE_ENV=production cross-env INPUT_DIR=src/ cross-env OUTPUT_DIR=dist/ pnpm run build:package",
         "build:package": "pnpm run build:prebuild && pnpm run build:api && rollup -c && pnpm run build:postbuild",
         "build:api": "node ./scripts/build-api.js",
         "build:prebuild": "node ./scripts/prebuild.mjs",
