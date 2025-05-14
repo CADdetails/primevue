@@ -1,15 +1,9 @@
 {
-    "name": "primevue",
+    "name": "@nich3712/primevue",
     "version": "4.3.4",
+    "description": "Custom fork of PrimeVue for internal use.",
     "author": "PrimeTek Informatics",
-    "description": "PrimeVue is an open source UI library for Vue featuring a rich set of 80+ components, a theme designer, various theme alternatives such as Material, Bootstrap, Tailwind, premium templates and professional support. In addition, it integrates with PrimeBlock, which has 370+ ready to use UI blocks to build spectacular applications in no time.",
-    "homepage": "https://primevue.org/",
     "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/primefaces/primevue.git",
-        "directory": "packages/primevue"
-    },
     "bugs": {
         "url": "https://github.com/primefaces/primevue/issues"
     },
@@ -337,7 +331,7 @@
         "access": "public"
     },
     "scripts": {
-        "build": "NODE_ENV=production INPUT_DIR=src/ OUTPUT_DIR=dist/ pnpm run build:package",
+        "build": "cross-env NODE_ENV=production INPUT_DIR=src/ OUTPUT_DIR=dist/ pnpm run build:package",
         "build:package": "pnpm run build:prebuild && pnpm run build:api && rollup -c && pnpm run build:postbuild",
         "build:api": "node ./scripts/build-api.js",
         "build:prebuild": "node ./scripts/prebuild.mjs",
@@ -352,13 +346,18 @@
         "vitest": "^0.29.8"
     },
     "dependencies": {
-        "@primeuix/styled": "catalog:",
-        "@primeuix/utils": "catalog:",
-        "@primeuix/styles": "catalog:",
-        "@primevue/core": "workspace:*",
-        "@primevue/icons": "workspace:*"
+        "@primeuix/styled": "0.6.1",
+        "@primeuix/utils": "0.5.3",
+        "@primeuix/styles": "1.1.1",
+        "@primevue/core": "4.3.4",
+        "@primevue/icons": "4.3.4"
     },
     "engines": {
         "node": ">=12.11.0"
+    },
+    "homepage": "https://primevue.org/",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/primefaces/primevue.git"
     }
 }
