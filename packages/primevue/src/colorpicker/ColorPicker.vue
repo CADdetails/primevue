@@ -362,6 +362,9 @@ export default {
                 ZIndex.set('overlay', el, this.baseZIndex, this.$primevue.config.zIndex.overlay);
             }
 
+            // Issue: #7508
+            this.$attrSelector && el.setAttribute(this.$attrSelector, '');
+
             this.$emit('show');
         },
         onOverlayLeave() {
@@ -460,6 +463,7 @@ export default {
             this.hueDragging = true;
             this.pickHue(event);
             !this.isUnstyled && addClass(this.$el, 'p-colorpicker-dragging');
+            event.preventDefault();
         },
         isInputClicked(event) {
             return this.$refs.input && this.$refs.input.isSameNode(event.target);

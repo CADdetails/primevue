@@ -367,10 +367,25 @@ export default {
             }, 100);
         },
         onKeyDown(event) {
-            if (this.disabled || isAndroid()) {
+            if (this.disabled) {
                 event.preventDefault();
 
                 return;
+            }
+
+            if (isAndroid()) {
+                switch (event.code) {
+                    case 'Backspace':
+                        this.onBackspaceKey(event, this.editable);
+                        break;
+                    case 'Enter':
+                    case 'NumpadDecimal':
+                        this.onEnterKey(event);
+                        break;
+                    default:
+                        event.preventDefault();
+                        return;
+                }
             }
 
             const metaKey = event.metaKey || event.ctrlKey;
@@ -483,7 +498,6 @@ export default {
         },
         onOptionSelect(event, option, isHide = true) {
             const value = this.getOptionValue(option);
-
             this.updateModel(event, value);
             isHide && this.hide(true);
         },
@@ -656,7 +670,7 @@ export default {
                     this.onOptionSelect(event, this.visibleOptions[this.focusedOptionIndex]);
                 }
 
-                this.hide();
+                this.hide(true);
             }
 
             event.preventDefault();
@@ -695,6 +709,9 @@ export default {
             addStyle(el, { position: 'absolute', top: '0' });
             this.alignOverlay();
             this.scrollInView();
+
+            // Issue: #7508
+            this.$attrSelector && el.setAttribute(this.$attrSelector, '');
 
             setTimeout(() => {
                 this.autoFilterFocus && this.filter && focus(this.$refs.filterInput.$el);

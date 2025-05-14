@@ -8,7 +8,7 @@
             :name="$formName"
             :class="[cx('pcInputText'), inputClass]"
             :style="inputStyle"
-            :value="inputValue"
+            :defaultValue="inputValue"
             :placeholder="placeholder"
             :tabindex="!disabled ? tabindex : -1"
             :fluid="$fluid"
@@ -789,6 +789,9 @@ export default {
 
             addStyle(el, { position: 'absolute', top: '0' });
             this.alignOverlay();
+
+            // Issue: #7508
+            this.$attrSelector && el.setAttribute(this.$attrSelector, '');
         },
         onOverlayAfterEnter() {
             this.bindOutsideClickListener();
