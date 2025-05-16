@@ -308,18 +308,26 @@ export default {
         bindDocumentEditListener() {
             if (!this.documentEditListener) {
                 this.documentEditListener = (event) => {
+                    this.selfClick = this.$el && this.$el.contains(event.target);
+
+                    if (this.editCompleteTimeout) {
+                        clearTimeout(this.editCompleteTimeout);
+                    }
+
                     if (!this.selfClick) {
-                        this.completeEdit(event, 'outside');
+                        this.editCompleteTimeout = setTimeout(() => {
+                            this.completeEdit(event, 'outside');
+                        }, 1);
                     }
                     this.selfClick = false;
                 };
                 //
-                document.addEventListener('click', this.documentEditListener);
+                document.addEventListener('mousedown', this.documentEditListener);
             }
         },
         unbindDocumentEditListener() {
             if (this.documentEditListener) {
-                document.removeEventListener('click', this.documentEditListener);
+                document.removeEventListener('mousedown', this.documentEditListener);
                 this.documentEditListener = null;
                 this.selfClick = false;
 
