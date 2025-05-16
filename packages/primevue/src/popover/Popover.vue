@@ -156,12 +156,9 @@ export default {
 
             const containerEl = this.container;
             const targetEl = this.target;
-            console.log('▶ Popover alignOverlay triggered');
-            console.log('Target Element:', this.target);
-            console.log('Container Element:', this.container);
             // Detect if target is inside a dialog
             const dialogContent = targetEl.closest('.p-dialog-content');
-            const isInDialog = !!dialogContent;
+            const isInDialog = !!dialogContent && this.isModal;
 
             if (isInDialog) {
                 // Position relative to dialog content box
@@ -183,7 +180,6 @@ export default {
                 const containerEl = this.container;
                 const targetEl = this.target;
                 const spacing = 8;
-                const minBuffer = 100;
 
                 const targetRect = targetEl.getBoundingClientRect();
                 const containerRect = containerEl.getBoundingClientRect();
@@ -191,8 +187,9 @@ export default {
 
                 const spaceBelow = window.innerHeight - targetRect.bottom - spacing;
                 const spaceAbove = targetRect.top - spacing;
+                const buffer = 50; // buffer margin, adjust as needed
 
-                const shouldFlip = spaceBelow < popoverHeight + spacing && spaceAbove > popoverHeight + spacing + minBuffer;
+                const shouldFlip = spaceBelow < popoverHeight + spacing + buffer && spaceAbove > popoverHeight + spacing;
                 // Calculate position
                 const top = shouldFlip ? targetRect.top - popoverHeight - spacing : targetRect.bottom + spacing;
 
@@ -212,17 +209,6 @@ export default {
                     containerEl.removeAttribute('data-p-popover-flipped');
                     if (!this.isUnstyled) containerEl.classList.remove('p-popover-flipped');
                 }
-
-                // Debug logs
-                console.log('[Popover alignOverlay]', {
-                    shouldFlip,
-                    spaceBelow,
-                    spaceAbove,
-                    popoverHeight,
-                    targetRect,
-                    top,
-                    left
-                });
             }
         },
         onContentKeydown(event) {
