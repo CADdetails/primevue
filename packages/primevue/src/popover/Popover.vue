@@ -15,7 +15,7 @@
 
 <script>
 import { $dt } from '@primeuix/styled';
-import { absolutePosition, addClass, addStyle, focus, getOffset, isClient, isTouchDevice, setAttribute } from '@primeuix/utils/dom';
+import { addStyle, focus, isClient, isTouchDevice, setAttribute } from '@primeuix/utils/dom';
 import { ZIndex } from '@primeuix/utils/zindex';
 import { ConnectedOverlayScrollHandler } from '@primevue/core/utils';
 import FocusTrap from 'primevue/focustrap';
@@ -29,6 +29,12 @@ export default {
     extends: BasePopover,
     inheritAttrs: false,
     emits: ['show', 'hide'],
+    props: {
+        isModal: {
+            type: Boolean,
+            default: false
+        }
+    },
     data() {
         return {
             visible: false
@@ -146,20 +152,77 @@ export default {
             }
         },
         alignOverlay() {
-            absolutePosition(this.container, this.target);
-            const containerOffset = getOffset(this.container);
-            const targetOffset = getOffset(this.target);
-            let arrowLeft = 0;
+            if (!this.container || !this.target) return;
 
-            if (containerOffset.left < targetOffset.left) {
-                arrowLeft = targetOffset.left - containerOffset.left;
-            }
+            const containerEl = this.container;
+            const targetEl = this.target;
+            console.log('▶ Popover alignOverlay triggered');
+            console.log('Target Element:', this.target);
+            console.log('Container Element:', this.container);
+            // Detect if target is inside a dialog
+            const dialogContent = targetEl.closest('.p-dialog-content');
+            const isInDialog = !!dialogContent;
 
-            this.container.style.setProperty($dt('popover.arrow.left').name, `${arrowLeft}px`);
+            if (isInDialog) {
+                // Position relative to dialog content box
+                const offsetParent = containerEl.offsetParent;
+                if (!offsetParent) return;
 
-            if (containerOffset.top < targetOffset.top) {
-                this.container.setAttribute('data-p-popover-flipped', 'true');
-                !this.isUnstyled && addClass(this.container, 'p-popover-flipped');
+                const top = targetEl.offsetTop + targetEl.offsetHeight + 8;
+                const left = targetEl.offsetLeft;
+
+                containerEl.style.position = 'absolute';
+                containerEl.style.top = `${top}px`;
+                containerEl.style.left = `${left}px`;
+
+                const arrowLeft = targetEl.offsetWidth / 2;
+                containerEl.style.setProperty($dt('popover.arrow.left').name, `${arrowLeft}px`);
+            } else {
+                if (!this.container || !this.target) return;
+
+                const containerEl = this.container;
+                const targetEl = this.target;
+                const spacing = 8;
+                const minBuffer = 100;
+
+                const targetRect = targetEl.getBoundingClientRect();
+                const containerRect = containerEl.getBoundingClientRect();
+                const popoverHeight = containerRect.height || 200; // fallback in case not rendered yet
+
+                const spaceBelow = window.innerHeight - targetRect.bottom - spacing;
+                const spaceAbove = targetRect.top - spacing;
+
+                const shouldFlip = spaceBelow < popoverHeight + spacing && spaceAbove > popoverHeight + spacing + minBuffer;
+                // Calculate position
+                const top = shouldFlip ? targetRect.top - popoverHeight - spacing : targetRect.bottom + spacing;
+
+                const left = targetRect.left;
+                const arrowLeft = targetRect.width / 2;
+
+                containerEl.style.position = 'fixed';
+                containerEl.style.top = `${top}px`;
+                containerEl.style.left = `${left}px`;
+                containerEl.style.setProperty($dt('popover.arrow.left').name, `${arrowLeft}px`);
+
+                // Handle flip classes/attributes
+                if (shouldFlip) {
+                    containerEl.setAttribute('data-p-popover-flipped', 'true');
+                    if (!this.isUnstyled) containerEl.classList.add('p-popover-flipped');
+                } else {
+                    containerEl.removeAttribute('data-p-popover-flipped');
+                    if (!this.isUnstyled) containerEl.classList.remove('p-popover-flipped');
+                }
+
+                // Debug logs
+                console.log('[Popover alignOverlay]', {
+                    shouldFlip,
+                    spaceBelow,
+                    spaceAbove,
+                    popoverHeight,
+                    targetRect,
+                    top,
+                    left
+                });
             }
         },
         onContentKeydown(event) {

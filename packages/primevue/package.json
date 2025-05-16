@@ -342,5 +342,8 @@
     },
     "engines": {
         "node": ">=12.11.0"
+    },
+    "bugs": {
+        "url": "https://github.com/primefaces/primevue/issues"
     }
 }
