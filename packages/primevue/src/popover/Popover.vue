@@ -183,25 +183,34 @@ export default {
 
                 const targetRect = targetEl.getBoundingClientRect();
                 const containerRect = containerEl.getBoundingClientRect();
-                const popoverHeight = containerRect.height || 200; // fallback in case not rendered yet
+                const popoverWidth = containerRect.width || 200;
+                const popoverHeight = containerRect.height || 200;
+                const buffer = 100;
 
+                // Vertical flip logic
                 const spaceBelow = window.innerHeight - targetRect.bottom - spacing;
                 const spaceAbove = targetRect.top - spacing;
-                const buffer = 50; // buffer margin, adjust as needed
+                const fitsBelow = spaceBelow >= popoverHeight + spacing;
+                const fitsAbove = spaceAbove >= popoverHeight + spacing;
+                const shouldFlip = !fitsBelow && (fitsAbove || spaceAbove > spaceBelow);
 
-                const shouldFlip = spaceBelow < popoverHeight + spacing + buffer && spaceAbove > popoverHeight + spacing;
-                // Calculate position
+                // Horizontal adjust logic
+                let left = targetRect.left;
+                if (left + popoverWidth + spacing > window.innerWidth) {
+                    left = window.innerWidth - popoverWidth - spacing;
+                }
+                if (left < spacing) {
+                    left = spacing;
+                }
+
                 const top = shouldFlip ? targetRect.top - popoverHeight - spacing : targetRect.bottom + spacing;
-
-                const left = targetRect.left;
-                const arrowLeft = targetRect.width / 2;
+                const arrowLeft = Math.min(targetRect.width / 2, popoverWidth - 16); // prevent arrow from overflowing
 
                 containerEl.style.position = 'fixed';
                 containerEl.style.top = `${top}px`;
                 containerEl.style.left = `${left}px`;
                 containerEl.style.setProperty($dt('popover.arrow.left').name, `${arrowLeft}px`);
-
-                // Handle flip classes/attributes
+                // Flip attribute
                 if (shouldFlip) {
                     containerEl.setAttribute('data-p-popover-flipped', 'true');
                     if (!this.isUnstyled) containerEl.classList.add('p-popover-flipped');
