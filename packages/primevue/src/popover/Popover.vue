@@ -4,7 +4,7 @@
             <div v-if="visible" :ref="containerRef" v-focustrap role="dialog" :aria-modal="visible" @click="onOverlayClick" :class="cx('root')" v-bind="ptmi('root')">
                 <slot v-if="$slots.container" name="container" :closeCallback="hide" :keydownCallback="(event) => onButtonKeydown(event)"></slot>
                 <template v-else>
-                    <div :class="cx('content')" @click="onContentClick" @mousedown="onContentClick" @keydown="onContentKeydown" v-bind="ptm('content')">
+                    <div :class="cx('content')" @click.capture="onContentClick" @mousedown.capture="onContentClick" @keydown="onContentKeydown" v-bind="ptm('content')">
                         <slot></slot>
                     </div>
                 </template>
@@ -15,7 +15,7 @@
 
 <script>
 import { $dt } from '@primeuix/styled';
-import { absolutePosition, addClass, addStyle, focus, getOffset, isClient, isTouchDevice, setAttribute } from '@primeuix/utils/dom';
+import { addStyle, focus, isClient, isTouchDevice, setAttribute } from '@primeuix/utils/dom';
 import { ZIndex } from '@primeuix/utils/zindex';
 import { ConnectedOverlayScrollHandler } from '@primevue/core/utils';
 import FocusTrap from 'primevue/focustrap';
@@ -29,6 +29,12 @@ export default {
     extends: BasePopover,
     inheritAttrs: false,
     emits: ['show', 'hide'],
+    props: {
+        isModal: {
+            type: Boolean,
+            default: false
+        }
+    },
     data() {
         return {
             visible: false
@@ -118,7 +124,7 @@ export default {
             }
 
             this.overlayEventListener = (e) => {
-                if (this.container.contains(e.target)) {
+                if (this.container.contains(e.target) || e.target.closest('.p-popover') === this.container) {
                     this.selfClick = true;
                 }
             };
@@ -146,21 +152,72 @@ export default {
             }
         },
         alignOverlay() {
-            absolutePosition(this.container, this.target, false);
+            if (!this.container || !this.target) return;
 
-            const containerOffset = getOffset(this.container);
-            const targetOffset = getOffset(this.target);
-            let arrowLeft = 0;
+            const containerEl = this.container;
+            const targetEl = this.target;
+            // Detect if target is inside a dialog
+            const dialogContent = targetEl.closest('.p-dialog-content');
+            const isInDialog = !!dialogContent && this.isModal;
 
-            if (containerOffset.left < targetOffset.left) {
-                arrowLeft = targetOffset.left - containerOffset.left;
-            }
+            if (isInDialog) {
+                // Position relative to dialog content box
+                const offsetParent = containerEl.offsetParent;
+                if (!offsetParent) return;
 
-            this.container.style.setProperty($dt('popover.arrow.left').name, `${arrowLeft}px`);
+                const top = targetEl.offsetTop + targetEl.offsetHeight + 8;
+                const left = targetEl.offsetLeft;
 
-            if (containerOffset.top < targetOffset.top) {
-                this.container.setAttribute('data-p-popover-flipped', 'true');
-                !this.isUnstyled && addClass(this.container, 'p-popover-flipped');
+                containerEl.style.position = 'absolute';
+                containerEl.style.top = `${top}px`;
+                containerEl.style.left = `${left}px`;
+
+                const arrowLeft = targetEl.offsetWidth / 2;
+                containerEl.style.setProperty($dt('popover.arrow.left').name, `${arrowLeft}px`);
+            } else {
+                if (!this.container || !this.target) return;
+
+                const containerEl = this.container;
+                const targetEl = this.target;
+                const spacing = 8;
+
+                const targetRect = targetEl.getBoundingClientRect();
+                const containerRect = containerEl.getBoundingClientRect();
+                const popoverWidth = containerRect.width || 200;
+                const popoverHeight = containerRect.height || 200;
+                const buffer = 100;
+
+                // Vertical flip logic
+                const spaceBelow = window.innerHeight - targetRect.bottom - spacing;
+                const spaceAbove = targetRect.top - spacing;
+                const fitsBelow = spaceBelow >= popoverHeight + spacing;
+                const fitsAbove = spaceAbove >= popoverHeight + spacing;
+                const shouldFlip = !fitsBelow && (fitsAbove || spaceAbove > spaceBelow);
+
+                // Horizontal adjust logic
+                let left = targetRect.left;
+                if (left + popoverWidth + spacing > window.innerWidth) {
+                    left = window.innerWidth - popoverWidth - spacing;
+                }
+                if (left < spacing) {
+                    left = spacing;
+                }
+
+                const top = shouldFlip ? targetRect.top - popoverHeight - spacing : targetRect.bottom + spacing;
+                const arrowLeft = Math.min(targetRect.width / 2, popoverWidth - 16); // prevent arrow from overflowing
+
+                containerEl.style.position = 'fixed';
+                containerEl.style.top = `${top}px`;
+                containerEl.style.left = `${left}px`;
+                containerEl.style.setProperty($dt('popover.arrow.left').name, `${arrowLeft}px`);
+                // Flip attribute
+                if (shouldFlip) {
+                    containerEl.setAttribute('data-p-popover-flipped', 'true');
+                    if (!this.isUnstyled) containerEl.classList.add('p-popover-flipped');
+                } else {
+                    containerEl.removeAttribute('data-p-popover-flipped');
+                    if (!this.isUnstyled) containerEl.classList.remove('p-popover-flipped');
+                }
             }
         },
         onContentKeydown(event) {
@@ -208,10 +265,11 @@ export default {
         bindOutsideClickListener() {
             if (!this.outsideClickListener && isClient()) {
                 this.outsideClickListener = (event) => {
+                    if (event.composedPath().includes(this.container)) this.selfClick = true;
+
                     if (this.visible && !this.selfClick && !this.isTargetClicked(event)) {
                         this.visible = false;
                     }
-
                     this.selfClick = false;
                 };
 

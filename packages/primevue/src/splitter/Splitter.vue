@@ -60,6 +60,7 @@ export default {
     beforeUnmount() {
         this.clear();
         this.unbindMouseListeners();
+        this.unbindTouchListeners();
     },
     methods: {
         isSplitterPanel(child) {

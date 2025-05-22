@@ -319,8 +319,9 @@ export default {
                             this.completeEdit(event, 'outside');
                         }, 1);
                     }
+                    this.selfClick = false;
                 };
-
+                //
                 document.addEventListener('mousedown', this.documentEditListener);
             }
         },
@@ -344,6 +345,7 @@ export default {
         },
         onClick(event) {
             if (this.editMode === 'cell' && this.isEditable()) {
+                this.selfClick = true;
                 if (!this.d_editing) {
                     this.d_editing = true;
                     this.bindDocumentEditListener();

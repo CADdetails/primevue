@@ -67,7 +67,17 @@
         </div>
         <Portal :appendTo="appendTo">
             <transition name="p-connected-overlay" @enter="onOverlayEnter" @after-enter="onOverlayAfterEnter" @leave="onOverlayLeave" @after-leave="onOverlayAfterLeave" v-bind="ptm('transition')">
-                <div v-if="overlayVisible" :ref="overlayRef" :class="[cx('overlay'), panelClass, overlayClass]" :style="[panelStyle, overlayStyle]" @click="onOverlayClick" @keydown="onOverlayKeyDown" :data-p="overlayDataP" v-bind="ptm('overlay')">
+                <div
+                    v-if="overlayVisible"
+                    :ref="overlayRef"
+                    :class="[cx('overlay'), panelClass, overlayClass]"
+                    :style="[panelStyle, overlayStyle]"
+                    @click="onOverlayClick"
+                    @mousedown.stop
+                    @keydown="onOverlayKeyDown"
+                    :data-p="overlayDataP"
+                    v-bind="ptm('overlay')"
+                >
                     <span
                         ref="firstHiddenFocusableElementOnOverlay"
                         role="presentation"
@@ -142,9 +152,8 @@
                                             :aria-disabled="isOptionDisabled(option)"
                                             :aria-setsize="ariaSetSize"
                                             :aria-posinset="getAriaPosInset(getOptionIndex(i, getItemOptions))"
-                                            @mousedown="onOptionSelect($event, option)"
+                                            @click="onOptionSelect($event, option)"
                                             @mousemove="onOptionMouseMove($event, getOptionIndex(i, getItemOptions))"
-                                            @click.stop
                                             :data-p-selected="!checkmark && isSelected(option)"
                                             :data-p-focused="focusedOptionIndex === getOptionIndex(i, getItemOptions)"
                                             :data-p-disabled="isOptionDisabled(option)"
@@ -814,7 +823,7 @@ export default {
                         focus(this.$refs.focusInput);
                     };
 
-                    label.addEventListener('click', this.labelClickListener);
+                    label.addEventListener('mousedown', this.labelClickListener);
                 }
             }
         },
@@ -823,7 +832,7 @@ export default {
                 const label = document.querySelector(`label[for="${this.labelId}"]`);
 
                 if (label && isVisible(label)) {
-                    label.removeEventListener('click', this.labelClickListener);
+                    label.removeEventListener('mousedown', this.labelClickListener);
                 }
             }
         },

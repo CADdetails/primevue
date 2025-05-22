@@ -74,7 +74,7 @@
         "access": "public"
     },
     "scripts": {
-        "build": "NODE_ENV=production INPUT_DIR=src/ OUTPUT_DIR=dist/ pnpm run build:package",
+        "build": "cross-env NODE_ENV=production cross-env INPUT_DIR=src/ cross-env OUTPUT_DIR=dist/ pnpm run build:package",
         "build:package": "pnpm run build:prebuild && pnpm run build:tokens && rollup -c && pnpm run build:postbuild",
         "build:tokens": "node ./scripts/build-tokens.js",
         "build:prebuild": "node ./scripts/prebuild.mjs",
@@ -87,5 +87,8 @@
     },
     "engines": {
         "node": ">=12.11.0"
+    },
+    "devDependencies": {
+        "cross-env": "^7.0.3"
     }
 }
